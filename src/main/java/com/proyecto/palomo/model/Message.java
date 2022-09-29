@@ -24,7 +24,7 @@ public class Message {
     @JoinColumn (name = "userId", updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User sender;
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn (name = "statusId", updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Status status;

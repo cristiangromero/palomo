@@ -3,6 +3,7 @@ package com.proyecto.palomo.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,4 +18,6 @@ public class Status {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long statusId;
     private String name;
+    @OneToMany(mappedBy = "status",cascade = CascadeType.ALL)
+    private List<Message> messages;
 }
