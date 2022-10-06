@@ -10,4 +10,6 @@ public interface IUserService {
     Optional<UserResponse> get(long id);
     Optional<UserResponse> update(long id, UserRequest request);
     boolean delete(long id);
+    void addContact(long id, String usernameOrEmail) throws Exception;
+    void removeContact(long id, String usernameOrEmail) throws Exception;
 }

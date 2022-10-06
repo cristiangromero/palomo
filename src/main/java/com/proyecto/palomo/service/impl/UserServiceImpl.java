@@ -58,4 +58,38 @@ public class UserServiceImpl implements IUserService {
             return false;
         }
     }
+
+    @Override
+    public void addContact(long id, String usernameOrEmail) throws Exception {
+        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
+
+        if (contact.isEmpty()) {
+            throw new Exception("El contacto a añadir, no existe.");
+        }
+
+        final var user = repository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new Exception("El usuario no existe.");
+        }
+
+        user.get().addContact(contact.get());
+    }
+
+    @Override
+    public void removeContact(long id, String usernameOrEmail) throws Exception {
+        final var user = repository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new Exception("El usuario no existe.");
+        }
+
+        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
+
+        if (contact.isEmpty()) {
+            throw new Exception("El contacto a remover, no existe.");
+        }
+
+        user.get().removeContact(contact.get());
+    }
 }

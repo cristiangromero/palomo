@@ -35,4 +35,18 @@ public class UserController {
         return service.delete(id) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/{id}/add/{contact}")
+    public ResponseEntity<UserResponse> addContact(@PathVariable("id") long id, @PathVariable("contact") String usernameOrEmail) throws Exception {
+        service.addContact(id, usernameOrEmail);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/remove/{contact}")
+    public ResponseEntity<UserResponse> removeContact(@PathVariable("id") long id, @PathVariable("contact") String usernameOrEmail) throws Exception {
+        service.removeContact(id, usernameOrEmail);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
