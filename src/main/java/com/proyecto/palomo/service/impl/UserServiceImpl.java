@@ -6,6 +6,7 @@ import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,10 +17,18 @@ public class UserServiceImpl implements IUserService {
 
     private final IUserRepository repository;
     private final UserMapper mapper;
+    private final PasswordEncoder encoder;
 
     @Override
-    public UserResponse create(UserRequest request) {
-        return mapper.toResponse(repository.save(mapper.toEntity(request)));
+    public UserResponse create(UserRequest request) throws Exception {
+        if (!request.passwordMatches()) {
+            throw new Exception("Las contraseñas no coinciden.");
+        }
+
+        final var entity = mapper.toEntity(request);
+        entity.setPassword(encoder.encode(request.getPassword()));
+
+        return mapper.toResponse(repository.save(entity));
     }
 
     @Override
@@ -35,6 +44,7 @@ public class UserServiceImpl implements IUserService {
 
         final var entity = mapper.toEntity(request);
         entity.setUserId(id);
+        entity.setPassword(encoder.encode(request.getPassword()));
 
         return Optional.of(mapper.toResponse(repository.save(entity)));
     }
