@@ -54,4 +54,8 @@ public class User {
 
         this.contacts.add(contact);
     }
+
+    public void removeContact(User contact) {
+        contacts.remove(contact);
+    }
 }
