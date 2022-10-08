@@ -8,6 +8,7 @@ import com.proyecto.palomo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -20,10 +21,11 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder encoder;
 
     @Override
+    @Transactional
     public UserResponse create(UserRequest request) throws Exception {
-        if (!request.passwordMatches()) {
+        /*if (!request.passwordMatches()) {
             throw new Exception("Las contraseñas no coinciden.");
-        }
+        }*/
 
         final var entity = mapper.toEntity(request);
         entity.setPassword(encoder.encode(request.getPassword()));
@@ -32,11 +34,13 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<UserResponse> get(long id) {
         return repository.findById(id).map(mapper::toResponse);
     }
 
     @Override
+    @Transactional
     public Optional<UserResponse> update(long id, UserRequest request) {
         if (!repository.existsById(id)) {
             return Optional.empty();
@@ -60,6 +64,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public void addContact(long id, String usernameOrEmail) throws Exception {
         final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
 
@@ -77,6 +82,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public void removeContact(long id, String usernameOrEmail) throws Exception {
         final var user = repository.findById(id);
 
