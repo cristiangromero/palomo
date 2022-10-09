@@ -19,7 +19,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/v2/api-docs", "/configuration/ui", "/configuration/security").permitAll()
+                .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
                 .and()
                 .build();
     }
