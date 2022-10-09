@@ -23,9 +23,9 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public UserResponse create(UserRequest request) throws Exception {
-        /*if (!request.passwordMatches()) {
+        if (!request.passwordMatches()) {
             throw new Exception("Las contraseñas no coinciden.");
-        }*/
+        }
 
         final var entity = mapper.toEntity(request);
         entity.setPassword(encoder.encode(request.getPassword()));
