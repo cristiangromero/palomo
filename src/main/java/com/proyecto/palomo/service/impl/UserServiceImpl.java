@@ -34,6 +34,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public UserResponse create(UserRequest request) throws Exception {
+        final var user = repository.findByUserNameOrEmail(request.getUsername(), request.getEmail());
+
+        if (user.isPresent()) {
+            throw new Exception("El usuario ya se encuentra registrado");
+        }
+
         if (!request.passwordMatches()) {
             throw new Exception("Las contraseñas no coinciden.");
         }
@@ -75,36 +81,28 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public void addContact(long id, String usernameOrEmail) throws Exception {
-        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
+        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new Exception("El contacto a añadir, no existe."));
 
-        if (contact.isEmpty()) {
-            throw new Exception("El contacto a añadir, no existe.");
-        }
+        final var user = repository.findById(id)
+                .orElseThrow(() -> new Exception("El usuario no existe."));
 
-        final var user = repository.findById(id);
+        user.addContact(contact);
 
-        if (user.isEmpty()) {
-            throw new Exception("El usuario no existe.");
-        }
-
-        user.get().addContact(contact.get());
+        repository.save(user);
     }
 
     @Override
     @Transactional
     public void removeContact(long id, String usernameOrEmail) throws Exception {
-        final var user = repository.findById(id);
+        final var user = repository.findById(id)
+                .orElseThrow(() -> new Exception("El usuario no existe."));
 
-        if (user.isEmpty()) {
-            throw new Exception("El usuario no existe.");
-        }
+        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new Exception("El contacto a remover, no existe."));
 
-        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
+        user.removeContact(contact);
 
-        if (contact.isEmpty()) {
-            throw new Exception("El contacto a remover, no existe.");
-        }
-
-        user.get().removeContact(contact.get());
+        repository.save(user);
     }
 }
