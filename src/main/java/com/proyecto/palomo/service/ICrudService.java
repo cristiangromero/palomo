@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface ICrudService <Request,Response>{
     JpaRepository<?,Long> repository();
-    Response create (Request request);
+    Response create (Request request) throws Exception;
     List<Response> getAll();
     Optional<Response> get(Long id);
     Optional<Response> update(long id, Request request);
