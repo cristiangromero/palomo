@@ -67,6 +67,16 @@ public class User {
         contacts.remove(contact);
     }
 
+    public void addRole(Role role) {
+        roles.add(role);
+        role.getUsers().add(this);
+    }
+
+    public void removeRole(Role role) {
+        roles.remove(role);
+        role.getUsers().remove(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

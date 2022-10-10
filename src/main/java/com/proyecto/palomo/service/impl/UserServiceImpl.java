@@ -3,7 +3,9 @@ package com.proyecto.palomo.service.impl;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.mapper.UserMapper;
+import com.proyecto.palomo.model.Role;
 import com.proyecto.palomo.model.User;
+import com.proyecto.palomo.repository.IRoleRepository;
 import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class UserServiceImpl implements IUserService {
 
     private final IUserRepository repository;
+    private final IRoleRepository roleRepository;
     private final UserMapper mapper;
     private final PasswordEncoder encoder;
 
@@ -37,6 +40,9 @@ public class UserServiceImpl implements IUserService {
 
         final var entity = mapper.toEntity(request);
         entity.setPassword(encoder.encode(request.getPassword()));
+
+        final var role = roleRepository.findByName("USER");
+        entity.addRole(role.orElseGet(() -> new Role("USER")));
 
         return mapper.toResponse(repository.save(entity));
     }
