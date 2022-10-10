@@ -32,7 +32,8 @@ public class SecurityConfig {
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .build();
+                .httpBasic()
+                .and().build();
     }
 
 }
