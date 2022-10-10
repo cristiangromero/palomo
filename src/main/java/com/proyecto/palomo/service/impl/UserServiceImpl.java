@@ -3,13 +3,16 @@ package com.proyecto.palomo.service.impl;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.mapper.UserMapper;
+import com.proyecto.palomo.model.User;
 import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,6 +22,11 @@ public class UserServiceImpl implements IUserService {
     private final IUserRepository repository;
     private final UserMapper mapper;
     private final PasswordEncoder encoder;
+
+    @Override
+    public JpaRepository<User, Long> repository() {
+        return repository;
+    }
 
     @Override
     @Transactional
@@ -34,8 +42,13 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public List<UserResponse> getAll() {
+        return mapper.toResponses(repository.findAll());
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public Optional<UserResponse> get(long id) {
+    public Optional<UserResponse> get(Long id) {
         return repository.findById(id).map(mapper::toResponse);
     }
 
@@ -51,16 +64,6 @@ public class UserServiceImpl implements IUserService {
         entity.setPassword(encoder.encode(request.getPassword()));
 
         return Optional.of(mapper.toResponse(repository.save(entity)));
-    }
-
-    @Override
-    public boolean delete(long id) {
-        try {
-            repository.deleteById(id);
-            return true;
-        } catch (Exception ex) {
-            return false;
-        }
     }
 
     @Override

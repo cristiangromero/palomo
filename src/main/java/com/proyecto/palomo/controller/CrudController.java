@@ -1,6 +1,9 @@
 package com.proyecto.palomo.controller;
 
 import com.proyecto.palomo.service.ICrudService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +16,7 @@ public abstract class CrudController <Request, Response>{
     @ApiResponse(code = 201, message = "Elemento registrado exitosamente")
     @ApiOperation(value = "Registra un nuevo elemento")
     @PostMapping
-    public ResponseEntity<Response> register(@RequestBody Request request) {
+    public ResponseEntity<Response> register(@RequestBody Request request) throws Exception {
         return ResponseEntity.status(HttpStatus.CREATED).body(service().create(request));
     }
 
