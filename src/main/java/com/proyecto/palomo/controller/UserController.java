@@ -40,8 +40,6 @@ public class UserController extends CrudController<UserRequest, UserResponse> {
         return ResponseEntity.ok(service.getAllContacts(id).stream().map(this.userMapper::toResponse).collect(Collectors.toList()));
     }
 
-
-
     @Override
     protected ICrudService<UserRequest, UserResponse> service() {
         return service;

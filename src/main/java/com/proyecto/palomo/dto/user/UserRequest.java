@@ -8,5 +8,6 @@ public class UserRequest {
 
     public boolean passwordMatches() {
         return !password.isBlank() && !repeatPassword.isBlank() && repeatPassword.equals(password);
+
     }
 }
