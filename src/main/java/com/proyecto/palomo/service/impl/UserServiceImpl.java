@@ -3,12 +3,14 @@ package com.proyecto.palomo.service.impl;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.mapper.UserMapper;
+import com.proyecto.palomo.model.User;
 import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -74,6 +76,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         user.get().addContact(contact.get());
+        repository.save(user.get());
     }
 
     @Override
@@ -91,5 +94,10 @@ public class UserServiceImpl implements IUserService {
         }
 
         user.get().removeContact(contact.get());
+    }
+
+    @Override
+    public List<User> getAllContacts(long userId) {
+        return repository.findById(userId).orElseThrow().getContacts();
     }
 }

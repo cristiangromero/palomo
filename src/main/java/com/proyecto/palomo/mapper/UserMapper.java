@@ -1,5 +1,6 @@
 package com.proyecto.palomo.mapper;
 
+import com.proyecto.palomo.dto.user.UserRegisterChat;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.model.User;
@@ -18,10 +19,14 @@ public interface UserMapper {
     List<UserResponse> toResponses(List<User> entities);
 
     @Mapping(target = "userStatus", ignore = true)
+    @Mapping(target = "name", source = "name")
     @Mapping(target = "userName", source = "username")
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "contacts", ignore = true)
     @Mapping(target = "chats", ignore = true)
     User toEntity(UserRequest request);
+
+    @Mapping(target = "userId", source = "userId")
+    User toEntity(UserRegisterChat request);
 
 }
