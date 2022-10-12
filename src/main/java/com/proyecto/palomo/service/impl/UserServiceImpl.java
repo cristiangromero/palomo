@@ -105,4 +105,10 @@ public class UserServiceImpl implements IUserService {
 
         repository.save(user);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllContacts(long userId) {
+        return mapper.toResponses(repository.findById(userId).orElseThrow().getContacts());
+    }
 }
