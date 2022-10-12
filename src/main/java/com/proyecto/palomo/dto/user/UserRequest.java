@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class UserRequest {
-    private String name, username, email, password, rPassword, picture;
+    private String name, username, email, password, repeatPassword, picture;
 
     public boolean passwordMatches() {
-        return password.equals(rPassword);
+        return !password.isBlank() && !repeatPassword.isBlank() && repeatPassword.equals(password);
+
     }
 }

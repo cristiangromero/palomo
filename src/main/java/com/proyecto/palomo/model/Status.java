@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "status")
 @Data
+@Builder
 public class Status {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
