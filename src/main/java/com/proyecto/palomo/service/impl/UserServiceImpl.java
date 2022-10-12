@@ -3,7 +3,9 @@ package com.proyecto.palomo.service.impl;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.mapper.UserMapper;
+import com.proyecto.palomo.model.Role;
 import com.proyecto.palomo.model.User;
+import com.proyecto.palomo.repository.IRoleRepository;
 import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class UserServiceImpl implements IUserService {
 
     private final IUserRepository repository;
+    private final IRoleRepository roleRepository;
     private final UserMapper mapper;
     private final PasswordEncoder encoder;
 
@@ -31,12 +34,21 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public UserResponse create(UserRequest request) throws Exception {
+        final var user = repository.findByUserNameOrEmail(request.getUsername(), request.getEmail());
+
+        if (user.isPresent()) {
+            throw new Exception("El usuario ya se encuentra registrado");
+        }
+
         if (!request.passwordMatches()) {
             throw new Exception("Las contraseñas no coinciden.");
         }
 
         final var entity = mapper.toEntity(request);
         entity.setPassword(encoder.encode(request.getPassword()));
+
+        final var role = roleRepository.findByName("USER");
+        entity.addRole(role.orElseGet(() -> new Role("USER")));
 
         return mapper.toResponse(repository.save(entity));
     }
@@ -69,42 +81,34 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public void addContact(long id, String usernameOrEmail) throws Exception {
-        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
+        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new Exception("El contacto a añadir, no existe."));
 
-        if (contact.isEmpty()) {
-            throw new Exception("El contacto a añadir, no existe.");
-        }
+        final var user = repository.findById(id)
+                .orElseThrow(() -> new Exception("El usuario no existe."));
 
-        final var user = repository.findById(id);
+        user.addContact(contact);
 
-        if (user.isEmpty()) {
-            throw new Exception("El usuario no existe.");
-        }
-
-        user.get().addContact(contact.get());
-        repository.save(user.get());
+        repository.save(user);
     }
 
     @Override
     @Transactional
     public void removeContact(long id, String usernameOrEmail) throws Exception {
-        final var user = repository.findById(id);
+        final var user = repository.findById(id)
+                .orElseThrow(() -> new Exception("El usuario no existe."));
 
-        if (user.isEmpty()) {
-            throw new Exception("El usuario no existe.");
-        }
+        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new Exception("El contacto a remover, no existe."));
 
-        final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail);
+        user.removeContact(contact);
 
-        if (contact.isEmpty()) {
-            throw new Exception("El contacto a remover, no existe.");
-        }
-
-        user.get().removeContact(contact.get());
+        repository.save(user);
     }
 
     @Override
-    public List<User> getAllContacts(long userId) {
-        return repository.findById(userId).orElseThrow().getContacts();
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllContacts(long userId) {
+        return mapper.toResponses(repository.findById(userId).orElseThrow().getContacts());
     }
 }
