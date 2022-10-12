@@ -82,6 +82,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         user.get().addContact(contact.get());
+        repository.save(user.get());
     }
 
     @Override
@@ -100,5 +101,10 @@ public class UserServiceImpl implements IUserService {
         }
 
         user.get().removeContact(contact.get());
+    }
+
+    @Override
+    public List<User> getAllContacts(long userId) {
+        return repository.findById(userId).orElseThrow().getContacts();
     }
 }
