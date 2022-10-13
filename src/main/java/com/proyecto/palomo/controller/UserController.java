@@ -17,6 +17,11 @@ public class UserController extends CrudController<UserRequest, UserResponse> {
 
     private final IUserService service;
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserResponse> getByUsername(@PathVariable("username") String username) {
+        return ResponseEntity.of(service.getByUsername(username));
+    }
+
     @PostMapping("/{id}/add/{contact}")
     public ResponseEntity<UserResponse> addContact(@PathVariable("id") long id, @PathVariable("contact") String usernameOrEmail) throws Exception {
         service.addContact(id, usernameOrEmail);
