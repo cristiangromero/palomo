@@ -82,23 +82,8 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/*")
-                        .allowedOrigins(originsClient)
+                        .allowedOrigins("*")
                         .allowedMethods("GET", "POST", "PUT","DELETE")
-                        .maxAge(3600);
-            }
-        };
-    }
-
-    @Value("${app.client}")
-    private String originsClient;
-    @Bean
-      public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/*")
-                        .allowedOrigins(originsClient)
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .maxAge(3600);
             }
         };
