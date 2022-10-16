@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @AllArgsConstructor
+@CrossOrigin(origins = "*")
 public class ChatController {
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
     private SimpMessagingTemplate simpMessagingTemplate;

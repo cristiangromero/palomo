@@ -119,4 +119,15 @@ public class UserServiceImpl implements IUserService {
         return mapper.toResponses(repository.findById(userId).orElseThrow().getContacts());
     }
 
+    public Optional<User> getByUserName(String userName) {
+        return repository.findByUserName(userName);
+    }
+
+    public Boolean existsByUsername(String username) {
+        return repository.existsByUserName(username);
+    }
+
+    public Boolean existsByEmail(String email) {
+        return repository.existsByEmail(email);
+    }
 }
