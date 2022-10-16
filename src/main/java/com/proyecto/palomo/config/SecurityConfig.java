@@ -59,7 +59,7 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/auth/signin", "/auth/signup").permitAll()
+                .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth/**", "/users").permitAll()
                 .antMatchers("/v2/api-docs", "/configuration/ui", "/configuration/security").permitAll()
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
@@ -79,7 +79,7 @@ public class SecurityConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/*")
+                registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedMethods("GET", "POST", "PUT","DELETE")
                         .maxAge(3600);

@@ -4,6 +4,7 @@ import com.proyecto.palomo.dto.auth.AuthRequest;
 import com.proyecto.palomo.dto.auth.JwtResponse;
 import com.proyecto.palomo.dto.auth.NoticeResponse;
 import com.proyecto.palomo.dto.user.UserRegister;
+import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.model.User;
 import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.security.jwt.JwtUtils;
@@ -78,23 +79,24 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody UserRegister userRegister) {
+    public ResponseEntity<?> registerUser(@RequestBody UserRequest userRequest) throws Exception {
 
 
 
-        if (userRepository.existsByUserName(userRegister.getUsername())) {
+        /*if (userRepository.existsByUserName(userRegister.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new NoticeResponse(new Date(), "Error: Username exists!"));
-        }
+        }*/
 
 
         /* Create new user's account */
-        User user = new User(userRegister.getUsername(),
+        /*User user = new User(userRegister.getUsername(),
                 userRegister.getEmail(),
                 encoder.encode(userRegister.getPassword()));
 
-        userRepository.save(user);
+        userRepository.save(user);*/
+        userService.create(userRequest);
         return ResponseEntity.ok(new NoticeResponse(new Date(),"User successfull!!"));
     }
 }
