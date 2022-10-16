@@ -54,6 +54,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAll() {
         return mapper.toResponses(repository.findAll());
     }
@@ -76,6 +77,12 @@ public class UserServiceImpl implements IUserService {
         entity.setPassword(encoder.encode(request.getPassword()));
 
         return Optional.of(mapper.toResponse(repository.save(entity)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<UserResponse> getByUsername(String username) {
+        return repository.findByUserName(username).map(mapper::toResponse);
     }
 
     @Override
