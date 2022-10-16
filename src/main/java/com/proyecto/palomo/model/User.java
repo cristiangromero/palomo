@@ -55,6 +55,7 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "roleId")})
     private Set<Role> roles = new HashSet<>();
 
+
     public void addContact(User contact){
         if(this.contacts == null){
             this.contacts = new ArrayList<>();
@@ -65,6 +66,17 @@ public class User {
 
     public void removeContact(User contact) {
         contacts.remove(contact);
+    }
+
+ /*   public User(String userName, String password, String encode) {
+        this.userName = userName;
+        this.password = password;
+    }*/
+
+    public User(String userName, String email, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
     }
 
     public void addRole(Role role) {
