@@ -27,11 +27,6 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder encoder;
 
     @Override
-    public JpaRepository<User, Long> repository() {
-        return repository;
-    }
-
-    @Override
     @Transactional
     public UserResponse create(UserRequest request) throws Exception {
         final var user = repository.findByUserNameOrEmail(request.getUsername(), request.getEmail());
@@ -53,15 +48,10 @@ public class UserServiceImpl implements IUserService {
         return mapper.toResponse(repository.save(entity));
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserResponse> getAll() {
-        return mapper.toResponses(repository.findAll());
-    }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserResponse> get(Long id) {
+    public Optional<UserResponse> get(long id) {
         return repository.findById(id).map(mapper::toResponse);
     }
 
@@ -77,6 +67,16 @@ public class UserServiceImpl implements IUserService {
         entity.setPassword(encoder.encode(request.getPassword()));
 
         return Optional.of(mapper.toResponse(repository.save(entity)));
+    }
+
+    @Override
+    public boolean delete(long id) {
+        try {
+            repository.deleteById(id);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     @Override
@@ -119,15 +119,4 @@ public class UserServiceImpl implements IUserService {
         return mapper.toResponses(repository.findById(userId).orElseThrow().getContacts());
     }
 
-    public Optional<User> getByUserName(String userName) {
-        return repository.findByUserName(userName);
-    }
-
-    public Boolean existsByUsername(String username) {
-        return repository.existsByUserName(username);
-    }
-
-    public Boolean existsByEmail(String email) {
-        return repository.existsByEmail(email);
-    }
 }
