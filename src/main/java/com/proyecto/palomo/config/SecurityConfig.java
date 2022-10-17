@@ -60,10 +60,10 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/auth/**", "/users").permitAll()
+                .antMatchers(HttpMethod.POST, "/auth/**").permitAll()
                 .antMatchers("/v2/api-docs", "/configuration/ui", "/configuration/security").permitAll()
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 
 
         http.authenticationProvider(authenticationProvider());
