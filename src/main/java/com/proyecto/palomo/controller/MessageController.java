@@ -7,6 +7,7 @@ import com.proyecto.palomo.service.impl.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class MessageController {
     private IMessageService service;
     private MessageMapper messageMapper;

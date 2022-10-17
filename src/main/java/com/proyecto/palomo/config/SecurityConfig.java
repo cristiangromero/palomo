@@ -45,8 +45,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration auth) throws Exception {
         return auth.getAuthenticationManager();
     }
-
-    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
@@ -61,7 +59,7 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/auth/signin", "/auth/signup").permitAll()
+                .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth/**", "/users").permitAll()
                 .antMatchers("/v2/api-docs", "/configuration/ui", "/configuration/security").permitAll()
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
@@ -81,24 +79,9 @@ public class SecurityConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/*")
-                        .allowedOrigins(originsClient)
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
                         .allowedMethods("GET", "POST", "PUT","DELETE")
-                        .maxAge(3600);
-            }
-        };
-    }
-
-    @Value("${app.client}")
-    private String originsClient;
-    @Bean
-      public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/*")
-                        .allowedOrigins(originsClient)
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .maxAge(3600);
             }
         };
