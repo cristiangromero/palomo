@@ -24,17 +24,25 @@ public class JwtUtils {
 
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-        return Jwts.builder().setSubject(userPrincipal.getUsername()).setId(Long.toString(userPrincipal.getId())).setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .setId(Long.toString(userPrincipal.getId()))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
+    private Claims getClaims(String token) {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+    }
+
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+        return getClaims(token).getSubject();
     }
 
     public String getUserIdFromJwtToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getId();
+        return getClaims(token).getId();
     }
 
     public boolean validateJwtToken(String authToken) {
