@@ -43,17 +43,22 @@ public class ChatService implements IChatService {
         if(chat.getUsers().get(0).getUserId().equals(chat.getUsers().get(1).getUserId()))
             return null;
         User[] users = {chat.getUsers().get(0), chat.getUsers().get(1)};
-        User user = userRepository.findById(users[0].getUserId()).orElseThrow();
-        Boolean isExistChat = user.getChats().stream().anyMatch(chatA -> (
+        User userA = userRepository.findById(users[0].getUserId()).orElseThrow();
+        User userB = userRepository.findById(users[1].getUserId()).orElseThrow();
+        Boolean isExistChat = userA.getChats().stream().anyMatch(chatA -> (
                 chatA.getName().equals(conformatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
                 chatA.getName().equals(conformatSimpleNameChat(users[1].getUserId(),users[0].getUserId()))));
         if (isExistChat)
             return null;
-        nchat.setUsers(chat.getUsers());
         nchat.setName(conformatSimpleNameChat(
                         users[0].getUserId(),
                         users[1].getUserId()));
-        return chatRespository.save(nchat);
+        nchat = chatRespository.save(nchat);
+        userA.addChat(nchat);
+        userB.addChat(nchat);
+        userRepository.save(userA);
+        userRepository.save(userB);
+        return nchat;
     }
 
     @Override
@@ -62,7 +67,11 @@ public class ChatService implements IChatService {
         List<User> users = chat.getUsers().stream().map(user -> userRepository.findById(user.getUserId()).orElseThrow()).collect(Collectors.toList());
         nchat.setName(conformatGroupNameChat(chat.getName()));
         nchat.setUsers(users);
-        return chatRespository.save(nchat);
+        nchat = chatRespository.save(nchat);
+        Chat finalNchat = nchat;
+        users.forEach(user -> user.addChat(finalNchat));
+        userRepository.saveAll(users);
+        return nchat;
     }
 
     @Override
