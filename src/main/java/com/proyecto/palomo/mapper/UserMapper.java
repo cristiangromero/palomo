@@ -12,12 +12,14 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Mapping(target = "status", source = "userStatus.name")
     @Mapping(target = "username", source = "userName")
     @Mapping(target = "id", source = "userId")
     UserResponse toResponse(User entity);
 
     List<UserResponse> toResponses(List<User> entities);
 
+    @Mapping(target = "roles", ignore = true)
     @Mapping(target = "userStatus", ignore = true)
     @Mapping(target = "name", source = "name")
     @Mapping(target = "userName", source = "username")

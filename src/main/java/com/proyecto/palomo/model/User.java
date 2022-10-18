@@ -28,10 +28,13 @@ public class User {
     private String password;
     @Column(nullable = true)
     private String picture;
+
+    private String info;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn (name = "userStatusId", nullable = true, updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Status userStatus;
+    private UserStatus userStatus;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "favorites",
@@ -67,11 +70,6 @@ public class User {
     public void removeContact(User contact) {
         contacts.remove(contact);
     }
-
- /*   public User(String userName, String password, String encode) {
-        this.userName = userName;
-        this.password = password;
-    }*/
 
     public User(String userName, String email, String password) {
         this.userName = userName;

@@ -2,11 +2,14 @@ package com.proyecto.palomo.service.impl;
 
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
+import com.proyecto.palomo.enums.UserStatusEnum;
 import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.model.Role;
 import com.proyecto.palomo.model.User;
+import com.proyecto.palomo.model.UserStatus;
 import com.proyecto.palomo.repository.IRoleRepository;
 import com.proyecto.palomo.repository.IUserRepository;
+import com.proyecto.palomo.repository.IUserStatusRepository;
 import com.proyecto.palomo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +26,7 @@ public class UserServiceImpl implements IUserService {
 
     private final IUserRepository repository;
     private final IRoleRepository roleRepository;
+    private final IUserStatusRepository userStatusRepository;
     private final UserMapper mapper;
     private final PasswordEncoder encoder;
 
@@ -41,6 +45,9 @@ public class UserServiceImpl implements IUserService {
 
         final var entity = mapper.toEntity(request);
         entity.setPassword(encoder.encode(request.getPassword()));
+
+        final var status = userStatusRepository.findByName(UserStatusEnum.AVAILABLE.getName());
+        entity.setUserStatus(status.orElseGet(() -> new UserStatus(UserStatusEnum.AVAILABLE)));
 
         final var role = roleRepository.findByName("USER");
         entity.addRole(role.orElseGet(() -> new Role("USER")));
