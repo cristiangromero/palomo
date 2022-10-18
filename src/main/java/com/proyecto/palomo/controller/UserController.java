@@ -2,7 +2,9 @@ package com.proyecto.palomo.controller;
 
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
+import com.proyecto.palomo.dto.userstatus.UserStatusResponse;
 import com.proyecto.palomo.service.IUserService;
+import com.proyecto.palomo.service.IUserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import java.util.List;
 public class UserController {
 
     private final IUserService service;
+    private final IUserStatusService userStatusService;
 
     @PostMapping
     public ResponseEntity<UserResponse> register(@RequestBody final UserRequest request) throws Exception {
@@ -60,6 +63,11 @@ public class UserController {
         service.removeContact(id, usernameOrEmail);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/statuses")
+    public ResponseEntity<List<UserStatusResponse>> getStatuses() {
+        return ResponseEntity.ok(userStatusService.getAll());
     }
 
 }
