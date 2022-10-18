@@ -64,6 +64,19 @@ public class User {
         this.contacts.add(contact);
     }
 
+    public void addChat(Chat chat) {
+        if (chats == null) {
+            chats = new ArrayList<>();
+        }
+        chats.add(chat);
+        chat.getUsers().add(this);
+    }
+
+    public void removeChat(Chat chat) {
+        chats.remove(chat);
+        chat.getUsers().remove(this);
+    }
+
     public void removeContact(User contact) {
         contacts.remove(contact);
     }
