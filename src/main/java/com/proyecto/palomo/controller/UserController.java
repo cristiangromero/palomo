@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.of(service.getByUsername(username));
     }
 
-    @PutMapping("/{id")
+    @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable("id") final long id, @RequestBody final UserRequest request) {
         return ResponseEntity.of(service.update(id, request));
     }
