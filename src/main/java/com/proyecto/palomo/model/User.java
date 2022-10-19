@@ -31,7 +31,7 @@ public class User {
 
     private String info;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne
     @JoinColumn (name = "userStatusId", nullable = true, updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private UserStatus userStatus;

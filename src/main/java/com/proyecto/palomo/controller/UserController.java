@@ -70,4 +70,9 @@ public class UserController {
         return ResponseEntity.ok(userStatusService.getAll());
     }
 
+    @PutMapping("/{id}/status/{statusId}")
+    public ResponseEntity<UserResponse> updateStatus(@PathVariable("id") long userId, @PathVariable("statusId") long statusId) throws Exception {
+        return ResponseEntity.of(service.updateStatus(userId, statusId));
+    }
+
 }

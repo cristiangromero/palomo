@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,13 +66,16 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public Optional<UserResponse> update(long id, UserRequest request) {
-        if (!repository.existsById(id)) {
+        final var user = repository.findById(id);
+
+        if (user.isEmpty()) {
             return Optional.empty();
         }
 
         final var entity = mapper.toEntity(request);
         entity.setUserId(id);
         entity.setPassword(encoder.encode(request.getPassword()));
+        entity.setUserStatus(user.get().getUserStatus());
 
         return Optional.of(mapper.toResponse(repository.save(entity)));
     }
@@ -124,6 +128,25 @@ public class UserServiceImpl implements IUserService {
     @Transactional(readOnly = true)
     public List<UserResponse> getAllContacts(long userId) {
         return mapper.toResponses(repository.findById(userId).orElseThrow().getContacts());
+    }
+
+    @Override
+    @Transactional
+    public Optional<UserResponse> updateStatus(long userId, long statusId) throws Exception {
+        final var user = repository.findById(userId)
+                .orElseThrow(() -> new Exception("No se ha encontrado al usuario"));
+
+        final var statusEnum = Arrays.stream(UserStatusEnum.values())
+                .filter(status -> status.getId() == statusId)
+                .findFirst()
+                .orElseThrow(() -> new Exception("Estado desconocido"));
+
+        final var status = userStatusRepository.findByName(statusEnum.getName())
+                .orElseThrow(() -> new Exception("Estado desconocido"));
+
+        user.setUserStatus(status);
+
+        return Optional.of(mapper.toResponse(repository.save(user)));
     }
 
 }

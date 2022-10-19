@@ -20,4 +20,5 @@ public interface IUserService {
     void removeContact(long id, String usernameOrEmail) throws Exception;
 
     List<UserResponse> getAllContacts(long userId);
+    Optional<UserResponse> updateStatus(long userId, long statusId) throws Exception;
 }
