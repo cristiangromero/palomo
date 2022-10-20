@@ -1,6 +1,7 @@
 package com.proyecto.palomo.service.impl;
 
 import com.proyecto.palomo.dto.chat.ChatGroupCreated;
+import com.proyecto.palomo.exception.ChatSimpleAlreadyExistsException;
 import com.proyecto.palomo.model.Chat;
 import com.proyecto.palomo.model.User;
 import com.proyecto.palomo.repository.IChatRespository;
@@ -47,12 +48,15 @@ public class ChatService implements IChatService {
         User userA = userRepository.findById(users[0].getUserId()).orElseThrow(() -> new Exception("Usuario A no encontrado."));
         User userB = userRepository.findById(users[1].getUserId()).orElseThrow(() -> new Exception("Usuario B no encontrado."));
 
-        boolean isExistChat = userA.getChats().stream().anyMatch(chatA -> (
-                chatA.getName().equals(formatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
-                chatA.getName().equals(formatSimpleNameChat(users[1].getUserId(),users[0].getUserId()))));
+        final var existingChat = userA.getChats()
+                .stream()
+                .filter(chatA ->
+                        chatA.getName().equals(formatSimpleNameChat(users[0].getUserId(), users[1].getUserId())) ||
+                        chatA.getName().equals(formatSimpleNameChat(users[1].getUserId(), users[0].getUserId())))
+                .findFirst();
 
-        if (isExistChat) {
-            throw new Exception("Este chat ya existe");
+        if (existingChat.isPresent()) {
+            throw new ChatSimpleAlreadyExistsException(existingChat.get());
         }
 
         nchat.setName(formatSimpleNameChat(
