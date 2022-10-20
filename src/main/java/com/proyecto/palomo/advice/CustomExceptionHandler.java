@@ -1,5 +1,6 @@
 package com.proyecto.palomo.advice;
 
+import com.proyecto.palomo.exception.ChatSimpleAlreadyExistsException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,6 +31,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
         body.put("timestamp", timestamp());
         body.put("message", ex.getMessage());
+
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(ChatSimpleAlreadyExistsException.class)
+    public ResponseEntity<Object> handleChatSimpleAlreadyExistsException(ChatSimpleAlreadyExistsException ex) {
+        final Map<String, Object> body = new LinkedHashMap<>();
+
+        body.put("timestamp", timestamp());
+        body.put("message", ex.getMessage());
+        body.put("chatName", ex.getChatName());
+        body.put("chatID", ex.getChatID());
 
         return ResponseEntity.badRequest().body(body);
     }
