@@ -33,7 +33,7 @@ public class User {
     private String description;
 
     @ManyToOne
-    @JoinColumn (name = "userStatusId", nullable = true, updatable = false)
+    @JoinColumn (name = "userStatusId")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private UserStatus userStatus;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
