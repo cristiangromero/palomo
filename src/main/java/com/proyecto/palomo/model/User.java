@@ -29,7 +29,8 @@ public class User {
     @Column(nullable = true)
     private String picture;
 
-    private String info;
+    @Column(nullable = false)
+    private String description;
 
     @ManyToOne
     @JoinColumn (name = "userStatusId", nullable = true, updatable = false)
