@@ -72,7 +72,7 @@ public class ChatController {
     }
 
     @PostMapping("/chat/simple")
-    public ResponseEntity<ChatResponse> createSimple(@RequestBody ChatSimpleCreated chatSimpleCreated){
+    public ResponseEntity<ChatResponse> createSimple(@RequestBody ChatSimpleCreated chatSimpleCreated) throws Exception {
         Chat chat = new Chat();
         chat.setUsers(chatSimpleCreated.users().stream().map(userMapper::toEntity).collect(Collectors.toList()));
         return ResponseEntity.ok(toChatResponse(chatService.cretedSimple(chat)));

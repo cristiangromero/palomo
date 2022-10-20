@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface IChatService {
     public Chat get(Long id);
-    public Chat cretedSimple(Chat chat);
+    public Chat cretedSimple(Chat chat) throws Exception;
     public Chat cretedGroup(Chat chat);
     public Chat getSimpleByUsers(Long userId, Long secondUserId);
     public List<Chat> getAllChatsByUserId(Long id, Integer page);
