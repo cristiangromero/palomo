@@ -3,7 +3,6 @@ package com.proyecto.palomo.controller;
 import com.proyecto.palomo.dto.chat.ChatGroupCreated;
 import com.proyecto.palomo.dto.chat.ChatResponse;
 import com.proyecto.palomo.dto.chat.ChatSimpleCreated;
-import com.proyecto.palomo.dto.message.MessageResponse;
 import com.proyecto.palomo.dto.message.MessageSend;
 import com.proyecto.palomo.dto.user.UserRegisterChat;
 import com.proyecto.palomo.mapper.MessageMapper;
@@ -12,22 +11,18 @@ import com.proyecto.palomo.model.Chat;
 import com.proyecto.palomo.model.Message;
 import com.proyecto.palomo.service.IChatService;
 import com.proyecto.palomo.service.IMessageService;
-import com.proyecto.palomo.service.impl.MessageService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,7 +70,7 @@ public class ChatController {
     public ResponseEntity<ChatResponse> createSimple(@RequestBody ChatSimpleCreated chatSimpleCreated) throws Exception {
         Chat chat = new Chat();
         chat.setUsers(chatSimpleCreated.users().stream().map(userMapper::toEntity).collect(Collectors.toList()));
-        return ResponseEntity.ok(toChatResponse(chatService.cretedSimple(chat)));
+        return ResponseEntity.ok(toChatResponse(chatService.createSimple(chat)));
     }
 
     @PostMapping("/chat/group")
@@ -83,7 +78,7 @@ public class ChatController {
         Chat chat = new Chat();
         chat.setName(chatGroupCreated.name());
         chat.setUsers(chatGroupCreated.users().stream().map(userMapper::toEntity).collect(Collectors.toList()));
-        return ResponseEntity.ok(toChatResponse(chatService.cretedGroup(chat)));
+        return ResponseEntity.ok(toChatResponse(chatService.createGroup(chat)));
     }
 
     public ChatResponse toChatResponse(Chat chat){

@@ -5,7 +5,7 @@ import com.proyecto.palomo.model.User;
 import com.proyecto.palomo.repository.IChatRespository;
 import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.service.IChatService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,20 +13,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatService implements IChatService {
 
-    private IChatRespository chatRepository;
-    private IUserRepository userRepository;
+    private final IChatRespository chatRepository;
+    private final IUserRepository userRepository;
 
     private static final String CHAT_SIMPLE_FORMAT = "@%s&%s";
     private static final String CHAT_GROUP_FORMAT = "#%s";
 
-    private String conformatSimpleNameChat(Long userId, Long secondUserId){
+    private String formatSimpleNameChat(Long userId, Long secondUserId){
         return String.format(CHAT_SIMPLE_FORMAT, userId, secondUserId);
     }
 
-    private String conformatGroupNameChat(String name){
+    private String formatGroupNameChat(String name){
         return String.format(CHAT_GROUP_FORMAT, name);
     }
 
@@ -36,7 +36,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public Chat cretedSimple(Chat chat) throws Exception {
+    public Chat createSimple(Chat chat) throws Exception {
         Chat nchat = new Chat();
         if(chat.getUsers().size() != 2)
             throw new Exception("Este chat debe tener 2 usuarios.");
@@ -48,14 +48,14 @@ public class ChatService implements IChatService {
         User userB = userRepository.findById(users[1].getUserId()).orElseThrow();
 
         boolean isExistChat = userA.getChats().stream().anyMatch(chatA -> (
-                chatA.getName().equals(conformatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
-                chatA.getName().equals(conformatSimpleNameChat(users[1].getUserId(),users[0].getUserId()))));
+                chatA.getName().equals(formatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
+                chatA.getName().equals(formatSimpleNameChat(users[1].getUserId(),users[0].getUserId()))));
 
         if (isExistChat) {
             throw new Exception("Este chat ya existe");
         }
 
-        nchat.setName(conformatSimpleNameChat(
+        nchat.setName(formatSimpleNameChat(
                         users[0].getUserId(),
                         users[1].getUserId()));
         nchat = chatRepository.save(nchat);
@@ -68,17 +68,28 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public Chat cretedGroup(Chat chat) {
+    public Chat createGroup(Chat chat) {
         Chat nchat = new Chat();
-        List<User> users = chat.getUsers().stream().map(user -> userRepository.findById(user.getUserId()).orElseThrow()).collect(Collectors.toList());
-        nchat.setName(conformatGroupNameChat(chat.getName()));
+
+        nchat.setName(formatGroupNameChat(chat.getName()));
+
+        List<User> users = chat.getUsers()
+                .stream()
+                .map(user -> userRepository.findById(user.getUserId()).orElseThrow())
+                .collect(Collectors.toList());
+
         nchat.setUsers(users);
         nchat = chatRepository.save(nchat);
+
         Chat finalNchat = nchat;
+
         users.forEach(user -> user.addChat(finalNchat));
+
         userRepository.saveAll(users);
+
         return nchat;
     }
+
 
     @Override
     public Chat getSimpleByUsers(Long userId, Long secondUserId) {
@@ -86,8 +97,8 @@ public class ChatService implements IChatService {
         User userSecond = userRepository.findById(secondUserId).get();
         User[] users = {user, userSecond};
         Chat chat = user.getChats().stream().filter(chatA -> (
-                chatA.getName().equals(conformatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
-                        chatA.getName().equals(conformatSimpleNameChat(users[1].getUserId(),users[0].getUserId()))))
+                chatA.getName().equals(formatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
+                        chatA.getName().equals(formatSimpleNameChat(users[1].getUserId(),users[0].getUserId()))))
                 .findAny().get();
         return chat;
     }
@@ -105,7 +116,7 @@ public class ChatService implements IChatService {
     public Chat addUserToChat(Long userId, Long chatId) {
         User user = userRepository.findById(userId).orElseThrow();
         Chat chat = chatRepository.findById(chatId).orElseThrow();
-        String type = chat.getName().toLowerCase().substring(0,1); //prefix @ to simple and # is group
+        String type = chat.getName().toLowerCase().substring(0,1); //prefix @ to simple and # to group
         if(!type.equals("#"))
             return null;
         chat.getUsers().add(user);
@@ -126,8 +137,6 @@ public class ChatService implements IChatService {
     public boolean isExistUserInChat(Long userId, Long chatId) {
         Chat chat = chatRepository.findById(chatId).orElseThrow();
         return chat.getUsers().stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findAny()
-                .isPresent();
+                .anyMatch(user -> user.getUserId().equals(userId));
     }
 }
