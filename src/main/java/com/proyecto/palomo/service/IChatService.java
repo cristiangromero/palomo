@@ -1,5 +1,6 @@
 package com.proyecto.palomo.service;
 
+import com.proyecto.palomo.dto.chat.ChatGroupCreated;
 import com.proyecto.palomo.model.Chat;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 public interface IChatService {
     public Chat get(Long id);
     public Chat createSimple(Chat chat) throws Exception;
-    public Chat createGroup(Chat chat);
+    public Chat createGroup(ChatGroupCreated chatGroup);
     public Chat getSimpleByUsers(Long userId, Long secondUserId);
     public List<Chat> getAllChatsByUserId(Long id, Integer page);
     public Chat addUserToChat(Long userId, Long chatId);

@@ -1,5 +1,8 @@
 package com.proyecto.palomo.service.impl;
 
+import com.proyecto.palomo.dto.chat.ChatGroupCreated;
+import com.proyecto.palomo.dto.user.UserRegisterChat;
+import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.model.Chat;
 import com.proyecto.palomo.model.User;
 import com.proyecto.palomo.repository.IChatRespository;
@@ -18,6 +21,7 @@ public class ChatService implements IChatService {
 
     private final IChatRespository chatRepository;
     private final IUserRepository userRepository;
+    private final UserMapper userMapper;
 
     private static final String CHAT_SIMPLE_FORMAT = "@%s&%s";
     private static final String CHAT_GROUP_FORMAT = "#%s";
@@ -68,26 +72,21 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public Chat createGroup(Chat chat) {
-        Chat nchat = new Chat();
+    public Chat createGroup(ChatGroupCreated chatGroup) {
+        Chat aux = new Chat();
 
-        nchat.setName(formatGroupNameChat(chat.getName()));
+        aux.setName(formatGroupNameChat(chatGroup.name()));
 
-        List<User> users = chat.getUsers()
-                .stream()
-                .map(user -> userRepository.findById(user.getUserId()).orElseThrow())
-                .collect(Collectors.toList());
+        for (final var userRegisterChat : chatGroup.users()) {
+            final var user = userRepository.findById(userRegisterChat.userId());
 
-        nchat.setUsers(users);
-        nchat = chatRepository.save(nchat);
+            user.ifPresent(_user -> {
+                _user.addChat(aux);
+                userRepository.save(_user);
+            });
+        }
 
-        Chat finalNchat = nchat;
-
-        users.forEach(user -> user.addChat(finalNchat));
-
-        userRepository.saveAll(users);
-
-        return nchat;
+        return chatRepository.save(aux);
     }
 
 

@@ -75,10 +75,7 @@ public class ChatController {
 
     @PostMapping("/chat/group")
     public ResponseEntity<ChatResponse> createGroup(@RequestBody ChatGroupCreated chatGroupCreated){
-        Chat chat = new Chat();
-        chat.setName(chatGroupCreated.name());
-        chat.setUsers(chatGroupCreated.users().stream().map(userMapper::toEntity).collect(Collectors.toList()));
-        return ResponseEntity.ok(toChatResponse(chatService.createGroup(chat)));
+        return ResponseEntity.ok(toChatResponse(chatService.createGroup(chatGroupCreated)));
     }
 
     public ChatResponse toChatResponse(Chat chat){
