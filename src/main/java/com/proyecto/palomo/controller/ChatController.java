@@ -52,7 +52,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/{roomId}/addUser")
-    public void addUser(@DestinationVariable String roomId, @Payload UserRegisterChat userRegisterChat, SimpMessageHeaderAccessor headerAccessor){
+    public void addUser(@DestinationVariable String roomId, @Payload UserRegisterChat userRegisterChat, SimpMessageHeaderAccessor headerAccessor) throws Exception {
         Long chatId = Long.parseLong(roomId);
         if(!chatService.isExist(Long.parseLong(roomId)))
             return;
@@ -62,7 +62,7 @@ public class ChatController {
     }
 
     @GetMapping("/chat")
-    public ResponseEntity<List<ChatResponse>> listAllChats(@RequestParam("userId") Long userId, @RequestParam("page") Integer page){
+    public ResponseEntity<List<ChatResponse>> listAllChats(@RequestParam("userId") Long userId, @RequestParam("page") Integer page) throws Exception {
         return ResponseEntity.ok(chatService.getAllChatsByUserId(userId, page).stream().map(this::toChatResponse).collect(Collectors.toList()));
     }
 
@@ -75,10 +75,7 @@ public class ChatController {
 
     @PostMapping("/chat/group")
     public ResponseEntity<ChatResponse> createGroup(@RequestBody ChatGroupCreated chatGroupCreated){
-        Chat chat = new Chat();
-        chat.setName(chatGroupCreated.name());
-        chat.setUsers(chatGroupCreated.users().stream().map(userMapper::toEntity).collect(Collectors.toList()));
-        return ResponseEntity.ok(toChatResponse(chatService.createGroup(chat)));
+        return ResponseEntity.ok(toChatResponse(chatService.createGroup(chatGroupCreated)));
     }
 
     public ChatResponse toChatResponse(Chat chat){
