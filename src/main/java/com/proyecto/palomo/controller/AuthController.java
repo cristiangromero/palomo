@@ -2,7 +2,6 @@ package com.proyecto.palomo.controller;
 
 import com.proyecto.palomo.dto.auth.AuthRequest;
 import com.proyecto.palomo.dto.auth.JwtResponse;
-import com.proyecto.palomo.dto.auth.NoticeResponse;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.repository.IUserRepository;
@@ -22,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
 
 @RestController
 @RequestMapping("/auth")
@@ -62,7 +59,7 @@ public class AuthController {
     JwtUtils jwtUtils;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest authRequest) throws Exception {
+    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody AuthRequest authRequest) throws Exception {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsernameOrEmail(), authRequest.getPassword()));
