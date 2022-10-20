@@ -1,8 +1,6 @@
 package com.proyecto.palomo.service.impl;
 
 import com.proyecto.palomo.dto.chat.ChatGroupCreated;
-import com.proyecto.palomo.dto.user.UserRegisterChat;
-import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.model.Chat;
 import com.proyecto.palomo.model.User;
 import com.proyecto.palomo.repository.IChatRespository;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +18,6 @@ public class ChatService implements IChatService {
 
     private final IChatRespository chatRepository;
     private final IUserRepository userRepository;
-    private final UserMapper userMapper;
 
     private static final String CHAT_SIMPLE_FORMAT = "@%s&%s";
     private static final String CHAT_GROUP_FORMAT = "#%s";
@@ -48,8 +44,8 @@ public class ChatService implements IChatService {
             throw new Exception("No puedes agregar dos veces al mismo usuario.");
 
         User[] users = {chat.getUsers().get(0), chat.getUsers().get(1)};
-        User userA = userRepository.findById(users[0].getUserId()).orElseThrow();
-        User userB = userRepository.findById(users[1].getUserId()).orElseThrow();
+        User userA = userRepository.findById(users[0].getUserId()).orElseThrow(() -> new Exception("Usuario A no encontrado."));
+        User userB = userRepository.findById(users[1].getUserId()).orElseThrow(() -> new Exception("Usuario B no encontrado."));
 
         boolean isExistChat = userA.getChats().stream().anyMatch(chatA -> (
                 chatA.getName().equals(formatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
@@ -73,48 +69,50 @@ public class ChatService implements IChatService {
 
     @Override
     public Chat createGroup(ChatGroupCreated chatGroup) {
-        Chat aux = new Chat();
+        final var aux = new Chat();
 
         aux.setName(formatGroupNameChat(chatGroup.name()));
+
+        final var chat = chatRepository.save(aux);
 
         for (final var userRegisterChat : chatGroup.users()) {
             final var user = userRepository.findById(userRegisterChat.userId());
 
             user.ifPresent(_user -> {
-                _user.addChat(aux);
+                _user.addChat(chat);
                 userRepository.save(_user);
             });
         }
 
-        return chatRepository.save(aux);
+        return chatRepository.save(chat);
     }
 
 
     @Override
-    public Chat getSimpleByUsers(Long userId, Long secondUserId) {
-        User user = userRepository.findById(userId).get();
-        User userSecond = userRepository.findById(secondUserId).get();
+    public Chat getSimpleByUsers(Long userId, Long secondUserId) throws Exception {
+        User user = userRepository.findById(userId).orElseThrow(() -> new Exception("Usuario principal no encontrado."));
+        User userSecond = userRepository.findById(secondUserId).orElseThrow(() -> new Exception("Usuario secundario no encontrado."));
         User[] users = {user, userSecond};
-        Chat chat = user.getChats().stream().filter(chatA -> (
-                chatA.getName().equals(formatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
+        return user.getChats()
+                .stream()
+                .filter(chatA -> (
+                        chatA.getName().equals(formatSimpleNameChat(users[0].getUserId(),users[1].getUserId())) ||
                         chatA.getName().equals(formatSimpleNameChat(users[1].getUserId(),users[0].getUserId()))))
-                .findAny().get();
-        return chat;
+                .findAny()
+                .orElseThrow(() -> new Exception("Chat no encontrado."));
     }
 
     @Override
-    public List<Chat> getAllChatsByUserId(Long id, Integer page) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return new ArrayList<>();
-        }
+    public List<Chat> getAllChatsByUserId(Long id, Integer page) throws Exception {
+        User user = userRepository.findById(id).orElseThrow(() -> new Exception("Usuario no encontrado: #" + id));
+
         return user.getChats();
     }
 
     @Override
-    public Chat addUserToChat(Long userId, Long chatId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        Chat chat = chatRepository.findById(chatId).orElseThrow();
+    public Chat addUserToChat(Long userId, Long chatId) throws Exception {
+        User user = userRepository.findById(userId).orElseThrow(() -> new Exception("Usuario no encontrado."));
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new Exception("Chat no encontrado."));
         String type = chat.getName().toLowerCase().substring(0,1); //prefix @ to simple and # to group
         if(!type.equals("#"))
             return null;
@@ -133,8 +131,8 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public boolean isExistUserInChat(Long userId, Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElseThrow();
+    public boolean isExistUserInChat(Long userId, Long chatId) throws Exception {
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new Exception("Chat no encontrado."));
         return chat.getUsers().stream()
                 .anyMatch(user -> user.getUserId().equals(userId));
     }
