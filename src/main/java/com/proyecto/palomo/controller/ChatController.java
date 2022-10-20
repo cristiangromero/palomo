@@ -83,6 +83,11 @@ public class ChatController {
         return ResponseEntity.ok(toChatResponse(chatService.createGroup(chatGroupCreated)));
     }
 
+    @PostMapping("/chat/{id}/add-user/{userId}")
+    public ResponseEntity<ChatResponse> addUserToChat(@PathVariable("id") long chatId, @PathVariable("userId") long userId) throws Exception {
+        return ResponseEntity.ok(toChatResponse(chatService.addUserToChat(userId, chatId)));
+    }
+
     public ChatResponse toChatResponse(Chat chat){
         return new ChatResponse(
                 chat.getChatId(),

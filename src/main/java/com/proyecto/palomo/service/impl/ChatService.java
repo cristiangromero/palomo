@@ -118,9 +118,13 @@ public class ChatService implements IChatService {
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("Usuario no encontrado."));
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new Exception("Chat no encontrado."));
         String type = chat.getName().toLowerCase().substring(0,1); //prefix @ to simple and # to group
+
         if(!type.equals("#"))
-            return null;
-        chat.getUsers().add(user);
+            throw new Exception("El tipo de chat al que deseas añadir el usuario, no es un grupo.");
+
+        user.addChat(chat);
+        userRepository.save(user);
+
         return chatRepository.save(chat);
     }
 
