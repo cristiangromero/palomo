@@ -6,7 +6,7 @@ import com.proyecto.palomo.model.Chat;
 import java.util.List;
 
 public interface IChatService {
-    public Chat get(Long id);
+    public Chat get(Long id) throws Exception;
     public Chat createSimple(Chat chat) throws Exception;
     public Chat createGroup(ChatGroupCreated chatGroup);
     public Chat getSimpleByUsers(Long userId, Long secondUserId) throws Exception;

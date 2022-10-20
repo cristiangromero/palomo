@@ -32,8 +32,8 @@ public class ChatService implements IChatService {
     }
 
     @Override
-    public Chat get(Long id) {
-        return chatRepository.findById(id).orElse(null);
+    public Chat get(Long id) throws Exception {
+        return chatRepository.findById(id).orElseThrow(() -> new Exception("Chat no encontrado con ID: " + id));
     }
 
     @Override

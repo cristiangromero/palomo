@@ -44,6 +44,11 @@ public class ChatController {
         return message;
     }*/
 
+    @GetMapping("/chat/{id}")
+    public ResponseEntity<ChatResponse> get(@PathVariable("id") long id) throws Exception {
+        return ResponseEntity.ok(toChatResponse(chatService.get(id)));
+    }
+
     @MessageMapping("/chat/{roomId}/sendMessage")
     public void sendMessage(@DestinationVariable String roomId, @Payload MessageSend messageSend){
         Message message = messageService.create(messageMapper.toMessage(messageSend));
