@@ -37,7 +37,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ChatSimpleAlreadyExistsException.class)
     public ResponseEntity<Object> handleChatSimpleAlreadyExistsException(ChatSimpleAlreadyExistsException ex) {
-        final Map<String, String> body = new LinkedHashMap<>();
+        final Map<String, Object> body = new LinkedHashMap<>();
 
         body.put("timestamp", timestamp());
         body.put("message", ex.getMessage());
