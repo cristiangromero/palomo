@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface IChatService {
     public Chat get(Long id);
-    public Chat cretedSimple(Chat chat);
-    public Chat cretedGroup(Chat chat);
+    public Chat createSimple(Chat chat) throws Exception;
+    public Chat createGroup(Chat chat);
     public Chat getSimpleByUsers(Long userId, Long secondUserId);
     public List<Chat> getAllChatsByUserId(Long id, Integer page);
     public Chat addUserToChat(Long userId, Long chatId);
