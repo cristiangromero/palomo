@@ -2,6 +2,7 @@ package com.proyecto.palomo.service.impl;
 
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
+import com.proyecto.palomo.dto.user.UserUpdate;
 import com.proyecto.palomo.enums.UserStatusEnum;
 import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.model.Role;
@@ -65,7 +66,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public Optional<UserResponse> update(long id, UserRequest request) {
+    public Optional<UserResponse> update(long id, UserUpdate userUpdate) {
         final var user = repository.findById(id);
 
         if (user.isEmpty()) {
