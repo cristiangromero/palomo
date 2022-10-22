@@ -39,12 +39,12 @@ public class MessageService implements IMessageService {
 
         m.setStatus(aux);
 
-        System.out.println(m);
+        System.out.println(m.getMessage() + m.getChat().getChatId());
 
         //1-enviado
         final var newM = messageRepository.save(m);
 
-        System.out.println(newM);
+        System.out.println(newM.getMessage() + "\n" + newM.getMessageId());
 
         return newM;
     }
