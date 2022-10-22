@@ -1,5 +1,6 @@
 package com.proyecto.palomo.model;
 
+import com.proyecto.palomo.enums.UserStatusEnum;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,9 +16,13 @@ import java.util.List;
 @Data
 public class UserStatus {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userStatusId;
     private String name;
     @OneToMany(mappedBy = "userStatus",cascade = CascadeType.ALL)
     private List<User> users;
+
+    public UserStatus(final UserStatusEnum userStatusEnum) {
+        this.userStatusId = userStatusEnum.getId();
+        this.name = userStatusEnum.getName();
+    }
 }

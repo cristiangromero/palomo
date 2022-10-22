@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "status")
 @Data
+@Builder
 public class Status {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,4 +21,8 @@ public class Status {
     private String name;
     @OneToMany(mappedBy = "status",cascade = CascadeType.ALL)
     private List<Message> messages;
+
+    public Status(String name) {
+        this.name = name;
+    }
 }
