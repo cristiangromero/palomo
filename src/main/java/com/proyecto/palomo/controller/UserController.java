@@ -1,9 +1,6 @@
 package com.proyecto.palomo.controller;
 
-import com.proyecto.palomo.dto.user.UserRequest;
-import com.proyecto.palomo.dto.user.UserResponse;
-import com.proyecto.palomo.dto.user.UserUpdate;
-import com.proyecto.palomo.dto.user.UserUpdatePassword;
+import com.proyecto.palomo.dto.user.*;
 import com.proyecto.palomo.dto.userstatus.UserStatusResponse;
 import com.proyecto.palomo.service.IUserService;
 import com.proyecto.palomo.service.IUserStatusService;
@@ -54,10 +51,8 @@ public class UserController {
     }
 
     @PostMapping("/{id}/add/{contact}")
-    public ResponseEntity<UserResponse> addContact(@PathVariable("id") long id, @PathVariable("contact") String usernameOrEmail) throws Exception {
-        service.addContact(id, usernameOrEmail);
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ContactResponse> addContact(@PathVariable("id") long id, @PathVariable("contact") String usernameOrEmail) throws Exception {
+        return ResponseEntity.ok(service.addContact(id, usernameOrEmail));
     }
 
     @GetMapping("/{id}/contacts")
@@ -66,10 +61,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/remove/{contact}")
-    public ResponseEntity<UserResponse> removeContact(@PathVariable("id") long id, @PathVariable("contact") String usernameOrEmail) throws Exception {
-        service.removeContact(id, usernameOrEmail);
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ContactResponse> removeContact(@PathVariable("id") long id, @PathVariable("contact") String usernameOrEmail) throws Exception {
+        return ResponseEntity.ok(service.removeContact(id, usernameOrEmail));
     }
 
     @GetMapping("/statuses")
