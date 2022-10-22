@@ -27,7 +27,6 @@ public class Message {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn (name = "statusId", updatable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Status status;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)

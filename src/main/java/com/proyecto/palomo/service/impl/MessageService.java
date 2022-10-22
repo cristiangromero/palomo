@@ -30,6 +30,7 @@ public class MessageService implements IMessageService {
         m.setMessage(message.getMessage());
         m.setChat(message.getChat());
         m.setTimestamp(new Date());
+        m.setSender(message.getSender());
 
         final var aux = statusRepository.findByName("Enviado")
                 .orElseGet(() -> {
@@ -39,12 +40,12 @@ public class MessageService implements IMessageService {
 
         m.setStatus(aux);
 
-        System.out.println(m.getMessage() + m.getChat().getChatId());
+        System.out.println(m.getMessage() + "\n" + m.getChat().getChatId());
 
         //1-enviado
         final var newM = messageRepository.save(m);
 
-        System.out.println(newM.getMessage() + "\n" + newM.getMessageId());
+        System.out.println(newM.getMessage() + "\n" + newM.getMessageId() + "\n" + newM.getSender().getUserId());
 
         return newM;
     }
