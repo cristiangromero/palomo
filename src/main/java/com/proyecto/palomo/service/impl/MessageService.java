@@ -9,6 +9,7 @@ import com.proyecto.palomo.service.IMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,7 @@ public class MessageService implements IMessageService {
     private final IStatusRepository statusRepository;
 
     @Override
+    @Transactional
     public Message create(Message message) throws Exception {
         Message m = new Message();
         m.setMessage(message.getMessage());
@@ -48,17 +50,20 @@ public class MessageService implements IMessageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Message> getByPage(Integer page, Long chatId) {
         return this.messageRepository.findByChat_ChatIdOrderByTimestampDesc(chatId, PageRequest.of(page,20))
                 .stream().collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Message> getByDateToNext(Date date, Long chatId) {
         return this.messageRepository.findByChat_ChatIdAndTimestampAfterOrderByTimestamp(chatId,date);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Message get(Long id) throws Exception {
         return this.messageRepository.findById(id).orElseThrow(() -> new Exception("No se encontró al mensaje."));
     }
