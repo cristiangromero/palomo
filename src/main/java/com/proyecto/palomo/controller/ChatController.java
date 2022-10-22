@@ -50,7 +50,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/{roomId}/sendMessage")
-    public void sendMessage(@DestinationVariable String roomId, @Payload MessageSend messageSend){
+    public void sendMessage(@DestinationVariable String roomId, @Payload MessageSend messageSend) throws Exception {
         Message message = messageService.create(messageMapper.toMessage(messageSend));
         simpMessagingTemplate.convertAndSend("/chat-room/" + roomId, messageMapper.toResponse(message));
         System.out.println(message.toString());

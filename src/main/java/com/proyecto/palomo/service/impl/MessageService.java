@@ -22,12 +22,12 @@ public class MessageService implements IMessageService {
     private IStatusRepository statusRepository;
 
     @Override
-    public Message create(Message message) {
+    public Message create(Message message) throws Exception {
         Message m = new Message();
         m.setMessage(message.getMessage());
         m.setChat(message.getChat());
         m.setTimestamp(new Date());
-        m.setStatus(statusRepository.findById(1L).orElse(null));
+        m.setStatus(statusRepository.findById(1L).orElseThrow(() -> new Exception("No se ha encontrado al estado del mensaje.")));
         //1-enviado
         return messageRepository.save(m);
     }
@@ -44,8 +44,8 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    public Message get(Long id) {
-        return this.messageRepository.findById(id).orElse(null);
+    public Message get(Long id) throws Exception {
+        return this.messageRepository.findById(id).orElseThrow(() -> new Exception("No se encontró al mensaje."));
     }
 
     @Override
