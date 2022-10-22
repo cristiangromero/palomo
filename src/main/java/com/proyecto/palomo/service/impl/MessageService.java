@@ -2,10 +2,11 @@ package com.proyecto.palomo.service.impl;
 
 
 import com.proyecto.palomo.model.Message;
+import com.proyecto.palomo.model.Status;
 import com.proyecto.palomo.repository.IMessageRepository;
 import com.proyecto.palomo.repository.IStatusRepository;
 import com.proyecto.palomo.service.IMessageService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MessageService implements IMessageService {
 
-    private IMessageRepository messageRepository;
+    private final IMessageRepository messageRepository;
 
-    private IStatusRepository statusRepository;
+    private final IStatusRepository statusRepository;
 
     @Override
     public Message create(Message message) throws Exception {
@@ -27,9 +28,23 @@ public class MessageService implements IMessageService {
         m.setMessage(message.getMessage());
         m.setChat(message.getChat());
         m.setTimestamp(new Date());
-        m.setStatus(statusRepository.findById(1L).orElseThrow(() -> new Exception("No se ha encontrado al estado del mensaje.")));
+
+        final var aux = statusRepository.findByName("Enviado")
+                .orElseGet(() -> {
+                    var status = new Status("Enviado");
+                    return statusRepository.save(status);
+                });
+
+        m.setStatus(aux);
+
+        System.out.println(m);
+
         //1-enviado
-        return messageRepository.save(m);
+        final var newM = messageRepository.save(m);
+
+        System.out.println(newM);
+
+        return newM;
     }
 
     @Override
