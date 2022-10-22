@@ -9,6 +9,7 @@ import com.proyecto.palomo.repository.IUserRepository;
 import com.proyecto.palomo.service.IChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +33,13 @@ public class ChatService implements IChatService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Chat get(Long id) throws Exception {
         return chatRepository.findById(id).orElseThrow(() -> new Exception("Chat no encontrado con ID: " + id));
     }
 
     @Override
+    @Transactional
     public Chat createSimple(Chat chat) throws Exception {
         Chat nchat = new Chat();
         if(chat.getUsers().size() != 2)
@@ -72,6 +75,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
+    @Transactional
     public Chat createGroup(ChatGroupCreated chatGroup) {
         final var aux = new Chat();
 
@@ -93,6 +97,7 @@ public class ChatService implements IChatService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public Chat getSimpleByUsers(Long userId, Long secondUserId) throws Exception {
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("Usuario principal no encontrado."));
         User userSecond = userRepository.findById(secondUserId).orElseThrow(() -> new Exception("Usuario secundario no encontrado."));
@@ -107,6 +112,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Chat> getAllChatsByUserId(Long id, Integer page) throws Exception {
         User user = userRepository.findById(id).orElseThrow(() -> new Exception("Usuario no encontrado: #" + id));
 
@@ -114,6 +120,7 @@ public class ChatService implements IChatService {
     }
 
     @Override
+    @Transactional
     public Chat addUserToChat(Long userId, Long chatId) throws Exception {
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("Usuario no encontrado."));
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new Exception("Chat no encontrado."));
@@ -134,11 +141,13 @@ public class ChatService implements IChatService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isExist(Long id) {
         return chatRepository.existsById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isExistUserInChat(Long userId, Long chatId) throws Exception {
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new Exception("Chat no encontrado."));
         return chat.getUsers().stream()

@@ -24,10 +24,12 @@ public class Message {
     @JoinColumn (name = "userId", updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User sender;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn (name = "statusId", updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Status status;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn (name = "chatId", updatable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
