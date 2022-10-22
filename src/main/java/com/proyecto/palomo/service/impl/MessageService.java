@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MessageService implements IMessageService {
 
     private final IMessageRepository messageRepository;
@@ -51,20 +52,17 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Message> getByPage(Integer page, Long chatId) {
         return this.messageRepository.findByChat_ChatIdOrderByTimestampDesc(chatId, PageRequest.of(page,20))
                 .stream().collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Message> getByDateToNext(Date date, Long chatId) {
         return this.messageRepository.findByChat_ChatIdAndTimestampAfterOrderByTimestamp(chatId,date);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Message get(Long id) throws Exception {
         return this.messageRepository.findById(id).orElseThrow(() -> new Exception("No se encontró al mensaje."));
     }
