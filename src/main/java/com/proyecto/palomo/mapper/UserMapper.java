@@ -32,13 +32,4 @@ public interface UserMapper {
     @Mapping(target = "userId", source = "userId")
     User toEntity(UserRegisterChat request);
 
-    @Mapping(target = "contacts", ignore = true)
-    @Mapping(target = "chats", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "userStatus", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "userName", source = "username")
-    @Mapping(target = "roles", ignore = true)
-    User toEntity(UserUpdate userUpdate);
-
 }

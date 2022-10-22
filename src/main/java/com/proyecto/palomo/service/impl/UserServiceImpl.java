@@ -3,6 +3,7 @@ package com.proyecto.palomo.service.impl;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.dto.user.UserUpdate;
+import com.proyecto.palomo.dto.user.UserUpdatePassword;
 import com.proyecto.palomo.enums.UserStatusEnum;
 import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.model.Role;
@@ -73,12 +74,23 @@ public class UserServiceImpl implements IUserService {
             return Optional.empty();
         }
 
-        final var entity = mapper.toEntity(request);
-        entity.setUserId(id);
-        entity.setPassword(encoder.encode(request.getPassword()));
-        entity.setUserStatus(user.get().getUserStatus());
+        user.get().setName(userUpdate.name());
+        user.get().setUserName(userUpdate.username());
+        user.get().setPicture(userUpdate.picture());
+        user.get().setDescription(userUpdate.description());
+        user.get().setEmail(userUpdate.email());
 
-        return Optional.of(mapper.toResponse(repository.save(entity)));
+        return Optional.of(mapper.toResponse(repository.save(user.get())));
+    }
+
+    @Override
+    public UserResponse changePassword(long id, UserUpdatePassword password) throws Exception {
+        final var user = repository.findById(id)
+                .orElseThrow(() -> new Exception("Usuario no encontrado."));
+
+        user.setPassword(encoder.encode(password.password()));
+
+        return mapper.toResponse(repository.save(user));
     }
 
     @Override

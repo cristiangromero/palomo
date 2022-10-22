@@ -3,6 +3,7 @@ package com.proyecto.palomo.service;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
 import com.proyecto.palomo.dto.user.UserUpdate;
+import com.proyecto.palomo.dto.user.UserUpdatePassword;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public interface IUserService {
 
     Optional<UserResponse> update(final long id, final UserUpdate userUpdate);
 
-    UserResponse changePassword(final long id, final String password) throws Exception;
+    UserResponse changePassword(final long id, final UserUpdatePassword password) throws Exception;
 
     boolean delete(final long id);
 

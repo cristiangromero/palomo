@@ -2,6 +2,8 @@ package com.proyecto.palomo.controller;
 
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
+import com.proyecto.palomo.dto.user.UserUpdate;
+import com.proyecto.palomo.dto.user.UserUpdatePassword;
 import com.proyecto.palomo.dto.userstatus.UserStatusResponse;
 import com.proyecto.palomo.service.IUserService;
 import com.proyecto.palomo.service.IUserStatusService;
@@ -37,8 +39,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> update(@PathVariable("id") final long id, @RequestBody final UserRequest request) {
-        return ResponseEntity.of(service.update(id, request));
+    public ResponseEntity<UserResponse> update(@PathVariable("id") final long id, @RequestBody final UserUpdate userUpdate) {
+        return ResponseEntity.of(service.update(id, userUpdate));
+    }
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<UserResponse> changePassword(@PathVariable("id") final long id, @RequestBody final UserUpdatePassword password) throws Exception {
+        return ResponseEntity.ok(service.changePassword(id, password));
     }
 
     @DeleteMapping("/{id}")
