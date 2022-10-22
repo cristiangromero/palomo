@@ -1,7 +1,6 @@
 package com.proyecto.palomo.service.impl;
 
-import com.proyecto.palomo.dto.user.UserRequest;
-import com.proyecto.palomo.dto.user.UserResponse;
+import com.proyecto.palomo.dto.user.*;
 import com.proyecto.palomo.enums.UserStatusEnum;
 import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.model.Role;
@@ -19,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -65,19 +65,30 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public Optional<UserResponse> update(long id, UserRequest request) {
+    public Optional<UserResponse> update(long id, UserUpdate userUpdate) {
         final var user = repository.findById(id);
 
         if (user.isEmpty()) {
             return Optional.empty();
         }
 
-        final var entity = mapper.toEntity(request);
-        entity.setUserId(id);
-        entity.setPassword(encoder.encode(request.getPassword()));
-        entity.setUserStatus(user.get().getUserStatus());
+        user.get().setName(userUpdate.name());
+        user.get().setUserName(userUpdate.username());
+        user.get().setPicture(userUpdate.picture());
+        user.get().setDescription(userUpdate.description());
+        user.get().setEmail(userUpdate.email());
 
-        return Optional.of(mapper.toResponse(repository.save(entity)));
+        return Optional.of(mapper.toResponse(repository.save(user.get())));
+    }
+
+    @Override
+    public UserResponse changePassword(long id, UserUpdatePassword password) throws Exception {
+        final var user = repository.findById(id)
+                .orElseThrow(() -> new Exception("Usuario no encontrado."));
+
+        user.setPassword(encoder.encode(password.password()));
+
+        return mapper.toResponse(repository.save(user));
     }
 
     @Override
@@ -98,30 +109,56 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public void addContact(long id, String usernameOrEmail) throws Exception {
+    public ContactResponse addContact(long id, String usernameOrEmail) throws Exception {
         final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new Exception("El contacto a añadir, no existe."));
 
         final var user = repository.findById(id)
                 .orElseThrow(() -> new Exception("El usuario no existe."));
 
+        final var contactExists = user.getContacts().stream()
+                .anyMatch(_contact -> Objects.equals(_contact.getUserId(), contact.getUserId()));
+
+        if (contact.getUserId() == id) {
+            throw new Exception("No te puedes añadir a ti mismo como contacto");
+        }
+
+        if (contactExists) {
+            throw new Exception("El contacto ya está añadido en tu lista de contactos.");
+        }
+
         user.addContact(contact);
 
         repository.save(user);
+
+        return new ContactResponse("Usuario añadido con éxito!", id, usernameOrEmail);
     }
 
     @Override
     @Transactional
-    public void removeContact(long id, String usernameOrEmail) throws Exception {
+    public ContactResponse removeContact(long id, String usernameOrEmail) throws Exception {
         final var user = repository.findById(id)
                 .orElseThrow(() -> new Exception("El usuario no existe."));
 
         final var contact = repository.findByUserNameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new Exception("El contacto a remover, no existe."));
 
+        final var existingContact = user.getContacts().stream()
+                .anyMatch(c -> Objects.equals(c.getUserId(), contact.getUserId()));
+
+        if (!existingContact) {
+            throw new Exception("El contacto que intentas eliminar, no está en tu lista de contactos");
+        }
+
+        if (contact.getUserId() == id) {
+            throw new Exception("No te puedes remover a ti mismo :D");
+        }
+
         user.removeContact(contact);
 
         repository.save(user);
+
+        return new ContactResponse("Contacto removido con éxito!", id, usernameOrEmail);
     }
 
     @Override

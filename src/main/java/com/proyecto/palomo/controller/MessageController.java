@@ -2,7 +2,6 @@ package com.proyecto.palomo.controller;
 
 import com.proyecto.palomo.dto.message.MessageResponse;
 import com.proyecto.palomo.mapper.MessageMapper;
-import com.proyecto.palomo.service.IMessageService;
 import com.proyecto.palomo.service.impl.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +18,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class MessageController {
-    private IMessageService service;
-    private MessageMapper messageMapper;
+    private final MessageService service;
+    private final MessageMapper messageMapper;
 
     @GetMapping("/chat/{chatId}/message")
     public ResponseEntity<List<MessageResponse>> getMessages(@PathVariable("chatId") Long chatId, @RequestParam("page") Integer page){
         List<MessageResponse> messages = service.getByPage(page, chatId).stream()
-                .map(message -> messageMapper.toResponse(message)).collect(Collectors.toList());
+                .map(messageMapper::toResponse).collect(Collectors.toList());
         return ResponseEntity.ok(messages);
     }
 

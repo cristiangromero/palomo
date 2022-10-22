@@ -3,6 +3,7 @@ package com.proyecto.palomo.mapper;
 import com.proyecto.palomo.dto.user.UserRegisterChat;
 import com.proyecto.palomo.dto.user.UserRequest;
 import com.proyecto.palomo.dto.user.UserResponse;
+import com.proyecto.palomo.dto.user.UserUpdate;
 import com.proyecto.palomo.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

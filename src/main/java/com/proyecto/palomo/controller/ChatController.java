@@ -44,8 +44,13 @@ public class ChatController {
         return message;
     }*/
 
+    @GetMapping("/chat/{id}")
+    public ResponseEntity<ChatResponse> get(@PathVariable("id") long id) throws Exception {
+        return ResponseEntity.ok(toChatResponse(chatService.get(id)));
+    }
+
     @MessageMapping("/chat/{roomId}/sendMessage")
-    public void sendMessage(@DestinationVariable String roomId, @Payload MessageSend messageSend){
+    public void sendMessage(@DestinationVariable String roomId, @Payload MessageSend messageSend) throws Exception {
         Message message = messageService.create(messageMapper.toMessage(messageSend));
         simpMessagingTemplate.convertAndSend("/chat-room/" + roomId, messageMapper.toResponse(message));
         System.out.println(message.toString());
@@ -76,6 +81,11 @@ public class ChatController {
     @PostMapping("/chat/group")
     public ResponseEntity<ChatResponse> createGroup(@RequestBody ChatGroupCreated chatGroupCreated){
         return ResponseEntity.ok(toChatResponse(chatService.createGroup(chatGroupCreated)));
+    }
+
+    @PostMapping("/chat/{id}/add-user/{userId}")
+    public ResponseEntity<ChatResponse> addUserToChat(@PathVariable("id") long chatId, @PathVariable("userId") long userId) throws Exception {
+        return ResponseEntity.ok(toChatResponse(chatService.addUserToChat(userId, chatId)));
     }
 
     public ChatResponse toChatResponse(Chat chat){

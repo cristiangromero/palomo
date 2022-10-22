@@ -21,4 +21,8 @@ public class Status {
     private String name;
     @OneToMany(mappedBy = "status",cascade = CascadeType.ALL)
     private List<Message> messages;
+
+    public Status(String name) {
+        this.name = name;
+    }
 }

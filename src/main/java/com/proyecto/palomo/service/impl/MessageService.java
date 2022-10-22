@@ -2,34 +2,53 @@ package com.proyecto.palomo.service.impl;
 
 
 import com.proyecto.palomo.model.Message;
+import com.proyecto.palomo.model.Status;
 import com.proyecto.palomo.repository.IMessageRepository;
 import com.proyecto.palomo.repository.IStatusRepository;
 import com.proyecto.palomo.service.IMessageService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Transactional
 public class MessageService implements IMessageService {
 
-    private IMessageRepository messageRepository;
+    private final IMessageRepository messageRepository;
 
-    private IStatusRepository statusRepository;
+    private final IStatusRepository statusRepository;
 
     @Override
-    public Message create(Message message) {
+    @Transactional
+    public Message create(Message message) throws Exception {
         Message m = new Message();
         m.setMessage(message.getMessage());
         m.setChat(message.getChat());
         m.setTimestamp(new Date());
-        m.setStatus(statusRepository.findById(1L).orElse(null));
+        m.setSender(message.getSender());
+
+        final var aux = statusRepository.findByName("Enviado")
+                .orElseGet(() -> {
+                    var status = new Status("Enviado");
+                    return statusRepository.save(status);
+                });
+
+        m.setStatus(aux);
+
+        System.out.println(m.getMessage() + "\n" + m.getChat().getChatId());
+
         //1-enviado
-        return messageRepository.save(m);
+        final var newM = messageRepository.save(m);
+
+        System.out.println(newM.getMessage() + "\n" + newM.getMessageId() + "\n" + newM.getSender().getUserId());
+
+        return newM;
     }
 
     @Override
@@ -44,8 +63,8 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    public Message get(Long id) {
-        return this.messageRepository.findById(id).orElse(null);
+    public Message get(Long id) throws Exception {
+        return this.messageRepository.findById(id).orElseThrow(() -> new Exception("No se encontró al mensaje."));
     }
 
     @Override
