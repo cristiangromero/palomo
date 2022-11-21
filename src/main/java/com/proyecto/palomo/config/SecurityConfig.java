@@ -54,17 +54,20 @@ public class SecurityConfig {
         return authProvider;
     }
 
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                .antMatchers("/ws", "/ws/**").permitAll()
                 .antMatchers("/v2/api-docs", "/configuration/ui", "/configuration/security").permitAll()
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                .anyRequest().permitAll();
-
+                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authenticationProvider(authenticationProvider());
 
@@ -72,6 +75,8 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
     @Value("${app.client}")
     private String originsClient;
     @Bean

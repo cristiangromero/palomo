@@ -9,11 +9,13 @@ import com.proyecto.palomo.mapper.MessageMapper;
 import com.proyecto.palomo.mapper.UserMapper;
 import com.proyecto.palomo.model.Chat;
 import com.proyecto.palomo.model.Message;
+import com.proyecto.palomo.security.jwt.JwtUtils;
 import com.proyecto.palomo.service.IChatService;
 import com.proyecto.palomo.service.IMessageService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -37,12 +39,7 @@ public class ChatController {
     private UserMapper userMapper;
     private IChatService chatService;
 
-    /*@MessageMapping("/message")
-    @SendTo("/chatroom/public")
-    public Message receiveMessage(@Payload Message message){
-
-        return message;
-    }*/
+    private JwtUtils jwtUtils;
 
     @GetMapping("/chat/{id}")
     public ResponseEntity<ChatResponse> get(@PathVariable("id") long id) throws Exception {
@@ -67,19 +64,23 @@ public class ChatController {
     }
 
     @GetMapping("/chat")
-    public ResponseEntity<List<ChatResponse>> listAllChats(@RequestParam("userId") Long userId, @RequestParam("page") Integer page) throws Exception {
-        return ResponseEntity.ok(chatService.getAllChatsByUserId(userId, page).stream().map(this::toChatResponse).collect(Collectors.toList()));
+    public ResponseEntity<List<ChatResponse>> listAllChats(@RequestHeader(name = "Authorization") String token, @RequestParam("page") Integer page) throws Exception {
+        return ResponseEntity.ok(chatService.getAllChatsByUserId(getIdByToken(token), page).stream().map(this::toChatResponse).collect(Collectors.toList()));
     }
 
     @PostMapping("/chat/simple")
-    public ResponseEntity<ChatResponse> createSimple(@RequestBody ChatSimpleCreated chatSimpleCreated) throws Exception {
+    public ResponseEntity<ChatResponse> createSimple(@RequestHeader(name = "Authorization") String token, @RequestBody ChatSimpleCreated chatSimpleCreated) throws Exception {
         Chat chat = new Chat();
+        if(chatSimpleCreated.users().stream().noneMatch(userRegisterChat -> userRegisterChat.userId().equals(getIdByToken(token))))
+            throw new RuntimeException("Not access");
         chat.setUsers(chatSimpleCreated.users().stream().map(userMapper::toEntity).collect(Collectors.toList()));
         return ResponseEntity.ok(toChatResponse(chatService.createSimple(chat)));
     }
 
     @PostMapping("/chat/group")
-    public ResponseEntity<ChatResponse> createGroup(@RequestBody ChatGroupCreated chatGroupCreated){
+    public ResponseEntity<ChatResponse> createGroup(@RequestHeader(name = "Authorization") String token, @RequestBody ChatGroupCreated chatGroupCreated){
+        if(chatGroupCreated.users().stream().noneMatch(userRegisterChat -> userRegisterChat.userId().equals(getIdByToken(token))))
+            throw new RuntimeException("Not access");
         return ResponseEntity.ok(toChatResponse(chatService.createGroup(chatGroupCreated)));
     }
 
@@ -97,5 +98,8 @@ public class ChatController {
                         .collect(Collectors.toList()),
                 chat.getName().startsWith("#")
         );
+    }
+    private long getIdByToken(String token) {
+        return Long.parseLong(jwtUtils.getUserIdFromJwtToken(token.substring(7)).trim());
     }
 }
